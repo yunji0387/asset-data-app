@@ -14,7 +14,7 @@ const StatsCard: React.FC = () => {
   useEffect(() => {
     const fetchGoldPrice = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:9090/gold-data/gold-price/');
+        const response = await fetch('http://127.0.0.1:9090/asset-data/gold-price/');
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
