@@ -1,5 +1,5 @@
-"use client"
-import React, { useEffect, useState } from 'react';
+"use client";
+import React, { useEffect, useState } from "react";
 
 interface AssetPriceData {
   price: number;
@@ -14,54 +14,85 @@ const StatsCard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchAssetPrice = async () => {
     if (!process.env.NEXT_PUBLIC_ASSET_DATA_API_URL) {
-      throw new Error("Environment variable NEXT_PUBLIC_ASSET_DATA_API_URL is required but not defined.");
+      throw new Error(
+        "Environment variable NEXT_PUBLIC_ASSET_DATA_API_URL is required but not defined."
+      );
     }
 
-    const fetchAssetPrice = async () => {
-      try {
-        const response = await fetch(process.env.NEXT_PUBLIC_ASSET_DATA_API_URL as string);
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-        const assetData: any = await response.json();
-        setGoldPrice(assetData.XAU);
-        setSilverPrice(assetData.XAG);
-        setBitcoinPrice(assetData.BTC);
-        setEthereumPrice(assetData.ETH);
-        setLoading(false);
-      } catch (err: any) {
-        setError(err.message || 'An unexpected error occurred');
-        setLoading(false);
+    setLoading(true);
+    setError(null); // Reset error state before fetching new data
+
+    try {
+      const response = await fetch(process.env.NEXT_PUBLIC_ASSET_DATA_API_URL as string);
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
       }
+      const assetData: any = await response.json();
+      setGoldPrice(assetData.XAU);
+      setSilverPrice(assetData.XAG);
+      setBitcoinPrice(assetData.BTC);
+      setEthereumPrice(assetData.ETH);
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchAssetPrice();
   }, []);
 
   return (
     <div>
-      <h2 className="text-xl font-bold">StatsCard</h2>
-      {loading && <p>Loading...</p>}
+      <div className="flex flex-row gap-2 items-center">
+        <button
+          onClick={fetchAssetPrice}
+          className={`text-white transition duration-300 ease-in-out transform ${
+            !loading && "hover:scale-105 hover:rotate-90"
+          }`}
+          disabled={loading}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="24"
+            height="24"
+            className={`${loading && "animate-spin"}`}
+          >
+            <polyline points="19 2 19 6 15 6"></polyline>
+            <path d="M20.49 12A9 9 0 1 1 19 5.51"></path>
+          </svg>
+        </button>
+        <h2 className="text-xl font-bold">Price</h2>
+      </div>
+      {/* {loading && <p>Loading...</p>} */}
       {error && <p className="text-red-500">Error: {error}</p>}
       {goldPrice && (
         <div>
-          <p>Gold Price: {goldPrice.price}</p> {/* Update 'price' based on API structure */}
+          <p>Gold: {goldPrice.price}</p>
         </div>
       )}
       {silverPrice && (
         <div>
-          <p>Silver Price: {silverPrice.price}</p> {/* Update 'price' based on API structure */}
+          <p>Silver: {silverPrice.price}</p>
         </div>
       )}
       {bitcoinPrice && (
         <div>
-          <p>Bitcoin Price: {bitcoinPrice.price}</p> {/* Update 'price' based on API structure */}
+          <p>Bitcoin: {bitcoinPrice.price}</p>
         </div>
       )}
       {ethereumPrice && (
         <div>
-          <p>Ethereum Price: {ethereumPrice.price}</p> {/* Update 'price' based on API structure */}
+          <p>Ethereum: {ethereumPrice.price}</p>
         </div>
       )}
     </div>
