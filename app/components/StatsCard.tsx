@@ -1,16 +1,26 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-interface AssetPriceData {
+interface Asset {
+  name: string;
   price: number;
-  [key: string]: any;
+  symbol: string;
+  updatedAt: string;
+  updatedAtReadable: string;
+}
+
+interface AssetData {
+  XAU: Asset;
+  XAG: Asset;
+  BTC: Asset;
+  ETH: Asset;
 }
 
 const StatsCard: React.FC = () => {
-  const [goldPrice, setGoldPrice] = useState<AssetPriceData | null>(null);
-  const [silverPrice, setSilverPrice] = useState<AssetPriceData | null>(null);
-  const [bitcoinPrice, setBitcoinPrice] = useState<AssetPriceData | null>(null);
-  const [ethereumPrice, setEthereumPrice] = useState<AssetPriceData | null>(null);
+  const [goldPrice, setGoldPrice] = useState<Asset | null>(null);
+  const [silverPrice, setSilverPrice] = useState<Asset | null>(null);
+  const [bitcoinPrice, setBitcoinPrice] = useState<Asset | null>(null);
+  const [ethereumPrice, setEthereumPrice] = useState<Asset | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
@@ -30,7 +40,7 @@ const StatsCard: React.FC = () => {
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-      const assetData: any = await response.json();
+      const assetData: AssetData = await response.json();
       setGoldPrice(assetData.XAU);
       setSilverPrice(assetData.XAG);
       setBitcoinPrice(assetData.BTC);
@@ -38,8 +48,12 @@ const StatsCard: React.FC = () => {
 
       const currentTime = new Date();
       setLastUpdated(currentTime.toLocaleString());
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "An unexpected error occurred");
+      } else {
+        setError("An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -74,29 +88,6 @@ const StatsCard: React.FC = () => {
             <path d="M21 12A9 9 0 1 1 19 6.3"></path>
           </svg>
         </button>
-
-        {/* <button
-          onClick={fetchAssetPrice}
-          className={`text-white transition duration-300 ease-in-out transform ${!loading && "hover:scale-105 hover:rotate-90"
-            }`}
-          disabled={loading}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            width="24"
-            height="24"
-            className={`${loading && "animate-spin"}`}
-          >
-            <polyline points="19 2 19 6 15 6"></polyline>
-            <path d="M20.49 12A9 9 0 1 1 19 5.51"></path>
-          </svg>
-        </button> */}
         <h2 className="text-xl font-bold">Price</h2>
       </div>
       {error && <p className="text-red-500">Error: {error}</p>}

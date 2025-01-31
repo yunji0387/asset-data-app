@@ -1,5 +1,5 @@
-import Image from "next/image";
-import FeatureCard from "./components/FeatureCard";
+// import Image from "next/image";
+// import FeatureCard from "./components/FeatureCard";
 import StatsCard from "./components/StatsCard";
 
 export default function Home() {
